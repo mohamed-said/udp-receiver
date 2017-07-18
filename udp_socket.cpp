@@ -1,6 +1,7 @@
 #include "udp_socket.h"
 
 UDPSocket::UDPSocket(char *p_server_name, uint16_t p_udp_port_number) {
+  server_name = new char[100];
   memcpy(server_name, p_server_name, sizeof(p_server_name));
   udp_port_number = p_udp_port_number;
 }
@@ -13,19 +14,24 @@ int UDPSocket::init() {
     fprintf(stderr, "ERROR, creating UDP socket..!!!\n");
     return errno;
   }
+  
 
   memset(&udp_socket_data, 0, sizeof(udp_socket_data));
   memset(&sender_udp_socket_data, 0, sizeof(sender_udp_socket_data));
 
-  memcpy(server, gethostbyname(server_name), sizeof(server_name));
+/*
+  server = gethostbyname(server_name);
+  //memcpy(server, gethostbyname(server_name), sizeof(server_name));
   if (server == nullptr) {
     fprintf(stderr, "ERROR, no such host..!!\n");
+    fprintf(stderr, "errno: %d\n", h_errno);
     return -1; 
   }
+*/
 
   udp_socket_data.sin_port = htons(udp_port_number);
   udp_socket_data.sin_family = AF_INET;
-  udp_socket_data.sin_addr = *(in_addr*) server->h_addr;
+  udp_socket_data.sin_addr.s_addr = INADDR_ANY;
 
   uint16_t bind_error = bind(udp_socket_fd, (sockaddr*) &udp_socket_data, sizeof(udp_socket_data));
   if (bind_error == -1) {
@@ -41,6 +47,7 @@ void *UDPSocket::run_recv_thread(UDPSocket *__sock_obj) {
   char message_buffer[65];
   socklen_t socket_length = sizeof(__sock_obj->udp_socket_data);
   while (true) {
+    memset(message_buffer, 0, sizeof(message_buffer));
     uint16_t recv_error = recvfrom(__sock_obj->udp_socket_fd, message_buffer, 
         64, MSG_CONFIRM, 
         (sockaddr*) &__sock_obj->sender_udp_socket_data, 

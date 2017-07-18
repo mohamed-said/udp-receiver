@@ -10,11 +10,14 @@ int main(int argc, char **argv) {
 		return 0;
 	}
   
-  char *ip_address = *argv;
-  uint16_t port_number = atoi(*(argv + 1));
+  cout << argv[1] << " " << argv[2] << endl;
+  char *ip_address = *(argv + 1);
+  uint16_t port_number = atoi(*(argv + 2));
   
+  cout << ip_address << " " << port_number << endl;
+
 	UDPSocket udp_socket_object(ip_address, port_number);
-	
+  	
 
 	uint16_t init_error = udp_socket_object.init();
 	if (init_error) {
