@@ -6,6 +6,10 @@ UDPSocket::UDPSocket(char *p_server_name, uint16_t p_udp_port_number) {
   udp_port_number = p_udp_port_number;
 }
 
+UDPSocket::~UDPSocket() {
+  delete server_name;
+  server_name = nullptr;
+}
 
 int UDPSocket::init() {
 
@@ -18,16 +22,6 @@ int UDPSocket::init() {
 
   memset(&udp_socket_data, 0, sizeof(udp_socket_data));
   memset(&sender_udp_socket_data, 0, sizeof(sender_udp_socket_data));
-
-/*
-  server = gethostbyname(server_name);
-  //memcpy(server, gethostbyname(server_name), sizeof(server_name));
-  if (server == nullptr) {
-    fprintf(stderr, "ERROR, no such host..!!\n");
-    fprintf(stderr, "errno: %d\n", h_errno);
-    return -1; 
-  }
-*/
 
   udp_socket_data.sin_port = htons(udp_port_number);
   udp_socket_data.sin_family = AF_INET;
