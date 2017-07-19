@@ -4,6 +4,7 @@ UDPSocket::UDPSocket(char *p_server_name, uint16_t p_udp_port_number) {
   server_name = new char[100];
   strcpy(server_name, p_server_name);
   udp_port_number = p_udp_port_number;
+  stop = false;
 }
 
 UDPSocket::~UDPSocket() {
@@ -18,6 +19,10 @@ int UDPSocket::init() {
     return errno;
   }
   
+  struct timeval recv_timeout;
+  recv_timeout.tv_sec = 0;
+  recv_timeout.tv_usec = 10;
+  setsockopt(udp_socket_fd, SOL_SOCKET, SO_RCVTIMEO, &recv_timeout, sizeof(recv_timeout));
 
   memset(&udp_socket_data, 0, sizeof(udp_socket_data));
   memset(&sender_udp_socket_data, 0, sizeof(sender_udp_socket_data));
@@ -38,7 +43,7 @@ int UDPSocket::init() {
 void *UDPSocket::run_recv_thread(UDPSocket *__sock_obj) {
   char message_buffer[65];
   socklen_t socket_length = sizeof(__sock_obj->udp_socket_data);
-  while (true) {
+  while (!__sock_obj->get_stop_status()) {
     memset(message_buffer, 0, sizeof(message_buffer));
     uint16_t recv_error = recvfrom(__sock_obj->udp_socket_fd, message_buffer, 
         64, MSG_CONFIRM, 
@@ -48,7 +53,11 @@ void *UDPSocket::run_recv_thread(UDPSocket *__sock_obj) {
       fprintf(stderr, " ** ERROR, receiving message from peer..!!\n");
       printf(" ** Error Number: %d\n", errno);
     } else {
-      printf("%s: %s", inet_ntoa(__sock_obj->sender_udp_socket_data.sin_addr), message_buffer);
+      if (!strcmp(message_buffer, "")) {
+        continue;
+      } else {
+        printf("%s: %s", inet_ntoa(__sock_obj->sender_udp_socket_data.sin_addr), message_buffer);
+      }
     }
   }
 }
@@ -62,6 +71,14 @@ int UDPSocket::start_receiving() {
     return -1;	
   }
   return 0;
+}
+
+bool UDPSocket::get_stop_status() {
+  return stop;
+}
+
+void UDPSocket::stop_receiving() {
+  stop = true;
 }
 
 pthread_t UDPSocket::get_recv_thread_id() {
