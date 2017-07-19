@@ -2,7 +2,7 @@
 
 UDPSocket::UDPSocket(char *p_server_name, uint16_t p_udp_port_number) {
   server_name = new char[100];
-  memcpy(server_name, p_server_name, sizeof(p_server_name));
+  strcpy(server_name, p_server_name);
   udp_port_number = p_udp_port_number;
 }
 
@@ -12,7 +12,6 @@ UDPSocket::~UDPSocket() {
 }
 
 int UDPSocket::init() {
-
   udp_socket_fd = socket(AF_INET, SOCK_DGRAM, 0);
   if (udp_socket_fd < 0) {
     fprintf(stderr, "ERROR, creating UDP socket..!!!\n");
@@ -34,7 +33,6 @@ int UDPSocket::init() {
   }
 
   return 0;
-
 }
 
 void *UDPSocket::run_recv_thread(UDPSocket *__sock_obj) {
@@ -50,7 +48,7 @@ void *UDPSocket::run_recv_thread(UDPSocket *__sock_obj) {
       fprintf(stderr, " ** ERROR, receiving message from peer..!!\n");
       printf(" ** Error Number: %d\n", errno);
     } else {
-      printf("%s: %s\n", inet_ntoa(__sock_obj->sender_udp_socket_data.sin_addr), message_buffer);
+      printf("%s: %s", inet_ntoa(__sock_obj->sender_udp_socket_data.sin_addr), message_buffer);
     }
   }
 }

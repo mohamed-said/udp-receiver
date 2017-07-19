@@ -18,10 +18,9 @@ private:
 	uint16_t udp_port_number;
 	struct sockaddr_in udp_socket_data;
 	struct sockaddr_in sender_udp_socket_data;
-
-	char *server_name;
-	
+	char *server_name;	
 	pthread_t recv_thread_id;
+	static void *run_recv_thread(UDPSocket*);	
 
 public:
 	
@@ -29,7 +28,6 @@ public:
   ~UDPSocket();
 	int init();
 	int start_receiving();
-	static void *run_recv_thread(UDPSocket*);	
   pthread_t get_recv_thread_id();
 };
 
