@@ -57,6 +57,7 @@ void *UDPSocket::run_recv_thread(UDPSocket *__sock_obj) {
 
 
 int UDPSocket::start_receiving() {
+  // TODO change pthread_create to cpp11 threads APIs
   uint16_t thread_error = pthread_create(&recv_thread_id, nullptr, 
       (void*(*)(void*))run_recv_thread, this);
   if (thread_error) {

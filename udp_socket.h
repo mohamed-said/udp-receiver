@@ -31,6 +31,9 @@ public:
 	int start_receiving();
 	static void *run_recv_thread(UDPSocket*);	
   pthread_t get_recv_thread_id();
+
+  // TODO implement stop_receiving() function
+
 };
 
 #endif
